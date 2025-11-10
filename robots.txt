@@ -1,0 +1,16 @@
+# robots.txt for ohmyfood
+# Permet aux robots de crawler le site
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /restaurants/
+
+# Désactiver le crawl des assets non pertinents
+Disallow: /assets/SASS/
+
+# Référence au sitemap
+Sitemap: https://ohmyfood.maximenardelli.fr/sitemap.xml
+
+# Délai entre les requêtes (en secondes)
+Crawl-delay: 1
