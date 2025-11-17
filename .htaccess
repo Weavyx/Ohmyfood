@@ -1,0 +1,104 @@
+# Enable GZIP Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Set Proper MIME Types
+<IfModule mod_mime.c>
+  AddType application/javascript js
+  AddType text/css css
+  AddType image/svg+xml svg svgz
+  AddEncoding gzip svgz
+</IfModule>
+
+# Enable Browser Caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+
+  # Cache images for 1 year
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  # Cache CSS and JavaScript for 1 month
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+
+  # Cache HTML for 24 hours
+  ExpiresByType text/html "access plus 24 hours"
+</IfModule>
+
+# Set Cache-Control Headers
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+
+  <FilesMatch "\.(xml|json)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # Security Headers
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Content-Security-Policy "frame-ancestors 'self';"
+</IfModule>
+
+# URL Rewriting - Handle clean URLs
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Set the base path for the subdomain
+  RewriteBase /
+
+  # Remove www if present
+  RewriteCond %{HTTP_HOST} ^www\.ohmyfood\.maximenardelli\.fr$ [NC]
+  RewriteRule ^(.*)$ https://ohmyfood.maximenardelli.fr/$1 [R=301,L]
+
+  # Redirect HTTP to HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # Prevent access to protected directories
+  RewriteRule ^\.htaccess$ - [F]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^(assets/SASS|assets/CSS/scss)(/|$) - [F]
+</IfModule>
+
+# Disable Directory Listing
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+# Prevent Access to Sensitive Files
+<FilesMatch "^\.(htaccess|htpasswd|git|env)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Block access to SASS source files
+<FilesMatch "\.scss$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
