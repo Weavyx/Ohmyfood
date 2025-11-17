@@ -49,10 +49,17 @@
 
   # Security Headers
   Header set X-Content-Type-Options "nosniff"
-  Header set X-Frame-Options "SAMEORIGIN"
   Header set X-XSS-Protection "1; mode=block"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
-  Header set Content-Security-Policy "frame-ancestors 'self';"
+
+  # Content Security Policy - Optimized for portfolio embed + Cloudflare Analytics
+  # FIXES:
+  # 1. Supprimé frame-ancestors 'self' (bloquait l'iframe du portfolio)
+  # 2. Ajouté https://maximenardelli.fr pour ressources du portfolio
+  # 3. Ajouté https://static.cloudflareinsights.com et https://cloudflareinsights.com pour beacon.min.js
+  # 4. Ajouté https://fonts.googleapis.com et https://fonts.gstatic.com pour Google Fonts
+  # 5. Ajouté https://ka-f.fontawesome.com pour FontAwesome webfonts
+  Header set Content-Security-Policy "default-src 'self' https://maximenardelli.fr; script-src 'self' 'unsafe-inline' https://maximenardelli.fr https://static.cloudflareinsights.com https://cloudflareinsights.com https://kit.fontawesome.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://maximenardelli.fr https://fonts.googleapis.com https://kit-free.fontawesome.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://kit-free.fontawesome.com https://ka-f.fontawesome.com; img-src 'self' data: https: https://maximenardelli.fr; connect-src 'self' https: https://static.cloudflareinsights.com https://cloudflareinsights.com; upgrade-insecure-requests;"
 </IfModule>
 
 # URL Rewriting - Handle clean URLs
